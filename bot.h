@@ -29,10 +29,13 @@ enum GameDifficulty
     PRO
 };
 
+
 struct Bot
 {
     enum GameDifficulty game_difficulty;
     enum MoveDirection direction_move;
+    
+    short side;
     short move;
 };
 

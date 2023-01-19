@@ -11,70 +11,85 @@
 #include "settings.h"
 #include "bot.h"
     
-void observe_game(struct Bot* bot1, struct Ball ball)
+void observe_game(struct Bot* bot, struct Ball ball)
 {
-    if (bot1->game_difficulty == DUMMY) //Difficult DUMMY
+    if (bot->game_difficulty == DUMMY) //Difficult DUMMY
     {
-        if ((ball.x <= TABLE_WIDTH / 3) && (ball.vx < 0))
+        if ((ball.x <= TABLE_WIDTH / 3) && (ball.vx < 0) && (bot->side == 1))
         {
-            bot1->move = 1;
+            bot->move = 1;
+        }
+        else if (ball.x >= (TABLE_WIDTH - TABLE_WIDTH / 3) && (ball.vx > 0) &&
+                 (bot->side == -1))
+        {
+            bot->move = 1;
         }
         else
         {
-            bot1->move = 0;
+            bot->move = 0;
         }
     } 
-    else if (bot1->game_difficulty == REGULAR) //Difficult REGULAR
+    else if (bot->game_difficulty == REGULAR) //Difficult REGULAR
     {
-        if (ball.x <= (TABLE_WIDTH / 2))
+        if ((ball.x <= TABLE_WIDTH / 2) && (ball.vx < 0) && (bot->side == 1))
         {
-            bot1->move = 1;
+            bot->move = 1;
+        }
+        else if (ball.x >= (TABLE_WIDTH - TABLE_WIDTH / 2) && (ball.vx > 0) &&
+                 (bot->side == -1))
+        {
+            bot->move = 1;
         }
         else
         {
-            bot1->move = 0;
+            bot->move = 0;
         }
     }
     else //Difficult PRO
     {
-         if (ball.x <= (TABLE_WIDTH / 1.5))
+        if ((ball.x <= TABLE_WIDTH / 1.5) && (ball.vx < 0) && (bot->side == 1))
         {
-            bot1->move = 1;
+            bot->move = 1;
+        }
+        else if (ball.x >= (TABLE_WIDTH - TABLE_WIDTH / 1.5) &&
+                 (ball.vx > 0) && (bot->side == -1))
+        {
+            bot->move = 1;
         }
         else
         {
-            bot1->move = 0;
+            bot->move = 0;
         }
     }
 }
 
-void decide_move(struct Bot* bot1, struct Paddle player1, struct Ball ball)
+void decide_move(struct Bot* bot, struct Paddle player, struct Ball ball)
 {
-    if (player1.y < ball.y)
+    if (player.y < ball.y)
     {
-        bot1->direction_move = DOWN;
+        bot->direction_move = DOWN;
     }
-    else if(player1.y > ball.y)
+    else if(player.y > ball.y)
     {
-        bot1->direction_move = UP;
+        bot->direction_move = UP;
     }
     else
     {
-        bot1->direction_move = KEEP;
+        bot->direction_move = KEEP;
     }
 }
 
-void excute_move(struct Bot bot1, struct Paddle* player1)
+void excute_move(struct Bot bot, struct Paddle* player)
 {
-    if (bot1.move == 1)
+    if (bot.move == 1)
     {
-        switch (bot1.direction_move)
+        switch (bot.direction_move)
         {
             case UP:
-                player1->vy = -PADDLE_SPEED;
+                player->vy = -PADDLE_SPEED;
                 break;
             case DOWN:
-                player1->vy = PADDLE_SPEED;
+                player->vy = PADDLE_SPEED;
                 break;
             case KEEP:
                 break;
@@ -82,13 +97,13 @@ void excute_move(struct Bot bot1, struct Paddle* player1)
     }
     else
     {
-        player1->vy = 0;
+        player->vy = 0;
     }
 }
 
-void play_bot(struct Bot* bot1, struct Paddle* player1, struct Ball ball)
+void play_bot(struct Bot* bot, struct Paddle* player, struct Ball ball)
 {
-    observe_game(bot1, ball);
-    decide_move(bot1, *player1, ball);
-    excute_move(*bot1, player1);
+    observe_game(bot, ball);
+    decide_move(bot, *player, ball);
+    excute_move(*bot, player);
 };

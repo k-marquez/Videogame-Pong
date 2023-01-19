@@ -18,10 +18,18 @@
 
 enum PongState
 {
+    SELECT_MOD,
     START,
     SERVE,
     PLAY,
     DONE
+};
+
+enum GameMode
+{
+    PLAYER_VS_PLAYER,
+    IA_VS_PLAYER,
+    IA_VS_IA,
 };
 
 struct Pong
@@ -30,8 +38,10 @@ struct Pong
     struct Paddle player2;
     struct Ball ball;
     struct Bot bot1;
+    struct Bot bot2;
 
     enum PongState state;
+    enum GameMode game_mode;
 
     int player1_score;
     int player2_score;

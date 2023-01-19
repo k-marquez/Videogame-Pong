@@ -23,13 +23,24 @@ void init_pong(struct Pong* pong, struct Sounds* sounds)
     init_paddle(&pong->player2, TABLE_WIDTH - PADDLE_WIDTH - PADDLE_X_OFFSET, TABLE_HEIGHT - PADDLE_HEIGHT - PADDLE_Y_OFFSET, PADDLE_WIDTH, PADDLE_HEIGHT);
     init_ball(&pong->ball, TABLE_WIDTH / 2 - BALL_SIZE / 2, TABLE_HEIGHT / 2 - BALL_SIZE / 2, BALL_SIZE);
     pong->state = START;
+    pong->game_mode = IA_VS_IA; //Could be setting by user
+    
     pong->player1_score = 0;
     pong->player2_score = 0;
+    
     pong->serving_player = 0;
     pong->winning_player = 0;
-    pong->bot1.game_difficulty = DUMMY; //Difficulty of game, could be setting
+    
+    pong->bot1.game_difficulty = PRO; //Difficulty of game, could be setting
     pong->bot1.direction_move = KEEP;
-    pong->bot1.move = 0;
+    pong->bot1.move = -1;
+    pong->bot1.side = 1;
+    
+    pong->bot2.game_difficulty = PRO; //Difficulty of game, could be setting
+    pong->bot2.direction_move = KEEP;
+    pong->bot2.move = -1;
+    pong->bot2.side = -1;
+    
     pong->sounds = sounds;
     srand(time(NULL));
 }
@@ -62,30 +73,36 @@ void handle_input_pong(struct Pong* pong, ALLEGRO_KEYBOARD_STATE* state)
     }
     else if (pong->state == PLAY)
     {
-        /*if (al_key_down(state, ALLEGRO_KEY_S))
-        {
-            pong->player1.vy = PADDLE_SPEED;
+        if (pong->game_mode == PLAYER_VS_PLAYER)
+        {        
+            if (al_key_down(state, ALLEGRO_KEY_S))
+            {
+                pong->player1.vy = PADDLE_SPEED;
+            }
+            else if (al_key_down(state, ALLEGRO_KEY_W))
+            {
+                pong->player1.vy = -PADDLE_SPEED;
+            }
+            else
+            {
+                pong->player1.vy = 0;
+            }
         }
-        else if (al_key_down(state, ALLEGRO_KEY_W))
-        {
-            pong->player1.vy = -PADDLE_SPEED;
-        }
-        else
-        {
-            pong->player1.vy = 0;
-        }*/
 
-        if (al_key_down(state, ALLEGRO_KEY_DOWN))
+        if (pong->game_mode != IA_VS_IA)
         {
-            pong->player2.vy = PADDLE_SPEED;
-        }
-        else if (al_key_down(state, ALLEGRO_KEY_UP))
-        {
-            pong->player2.vy = -PADDLE_SPEED;
-        }
-        else
-        {
-            pong->player2.vy = 0;
+            if (al_key_down(state, ALLEGRO_KEY_DOWN))
+            {
+                pong->player2.vy = PADDLE_SPEED;
+            }
+            else if (al_key_down(state, ALLEGRO_KEY_UP))
+            {
+                pong->player2.vy = -PADDLE_SPEED;
+            }
+            else
+            {
+                pong->player2.vy = 0;
+            }
         }
     }
     else

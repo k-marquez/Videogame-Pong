@@ -77,7 +77,16 @@ int main()
             handle_input_pong(&pong, &keyboard_state);
         }
 
-        play_bot(&pong.bot1, &pong.player1, pong.ball);
+        switch (pong.game_mode)
+        {
+            case PLAYER_VS_PLAYER:
+                break;
+            case IA_VS_IA:
+                play_bot(&pong.bot2, &pong.player2, pong.ball);
+            case IA_VS_PLAYER:
+                play_bot(&pong.bot1, &pong.player1, pong.ball);
+                break;
+        }
 
         if (redraw && al_is_event_queue_empty(queue))
         {
