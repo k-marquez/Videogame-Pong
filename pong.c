@@ -13,7 +13,6 @@
 
 #include <allegro5/allegro_primitives.h>
 
-#include "settings.h"
 #include "fonts.h"
 #include "pong.h"
 
@@ -43,6 +42,8 @@ void init_pong(struct Pong* pong, struct Sounds* sounds)
     pong->bot2.side = -1;
     
     pong->sounds = sounds;
+    set_default_config(&pong->settings);
+    
     srand(time(NULL));
 }
 

@@ -32,3 +32,18 @@
 #define FPS 60.0
 #define MAX_POINTS 5
 
+struct Custom_Settings
+{
+    int window_width;
+    int window_height;
+    int paddle_speed;
+    int max_points;
+};
+
+void configure_pong(struct Custom_Settings * settings,
+                    int ww,
+                    int wh,
+                    int ps,
+                    int mp);
+                    
+void set_default_config(struct Custom_Settings * settings);

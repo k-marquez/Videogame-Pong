@@ -15,11 +15,16 @@
 #include "ball.h"
 #include "sounds.h"
 #include "bot.h"
+#include "settings.h"
 
 enum PongState
 {
     OPEN_GAME,
     SETTINGS,
+    SET_SCREAM_RESOLUTION,
+    SET_PADDLE_SPEED,
+    SET_MAX_POINTS,
+    SET_SOUNDS,
     SELECT_MOD,
     SELECT_AI,
     START,
@@ -59,7 +64,9 @@ struct Pong
     int winning_player;
 
     struct Sounds* sounds;
+    struct Custom_Settings settings;
 };
+
 
 void init_pong(struct Pong* pong, struct Sounds* sounds);
 
