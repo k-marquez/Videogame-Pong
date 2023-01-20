@@ -87,35 +87,35 @@ void handle_input_pong(struct Pong* pong, ALLEGRO_KEYBOARD_STATE* state)
             pong->settings.window_width = 1024;
             pong->settings.window_height = 600;
             al_resize_display(pong->window, pong->settings.window_width, pong->settings.window_height);
-            pong->state = OPEN_GAME;
+            pong->state = SETTINGS;
         }
         else if (al_key_down(state, ALLEGRO_KEY_2))
         {
             pong->settings.window_width = 1024;
             pong->settings.window_height = 576;
             al_resize_display(pong->window, pong->settings.window_width, pong->settings.window_height);
-            pong->state = OPEN_GAME;
+            pong->state = SETTINGS;
         }
         else if (al_key_down(state, ALLEGRO_KEY_3))
         {
             pong->settings.window_width = 800;
             pong->settings.window_height = 600;
             al_resize_display(pong->window, pong->settings.window_width, pong->settings.window_height);
-            pong->state = OPEN_GAME;
+            pong->state = SETTINGS;
         }
         else if (al_key_down(state, ALLEGRO_KEY_4))
         {
             pong->settings.window_width = 640;
             pong->settings.window_height = 512;
             al_resize_display(pong->window, pong->settings.window_width, pong->settings.window_height);
-            pong->state = OPEN_GAME;
+            pong->state = SETTINGS;
         }
         else if (al_key_down(state, ALLEGRO_KEY_5))
         {
             pong->settings.window_width = 640;
             pong->settings.window_height = 480;
             al_resize_display(pong->window, pong->settings.window_width, pong->settings.window_height);
-            pong->state = OPEN_GAME;
+            pong->state = SETTINGS;
         }
         else if (al_key_down(state, ALLEGRO_KEY_4))
         {
@@ -127,12 +127,12 @@ void handle_input_pong(struct Pong* pong, ALLEGRO_KEYBOARD_STATE* state)
         if (al_key_down(state, ALLEGRO_KEY_1))
         {
             pong->sound_mode = ON;
-            pong->state = OPEN_GAME;
+            pong->state = SETTINGS;
         }
         else if (al_key_down(state, ALLEGRO_KEY_2))
         {
             pong->sound_mode = OFF;
-            pong->state = OPEN_GAME;
+            pong->state = SETTINGS;
         }
 
     }
@@ -151,6 +151,33 @@ void handle_input_pong(struct Pong* pong, ALLEGRO_KEYBOARD_STATE* state)
         else if (al_key_down(state, ALLEGRO_KEY_3))
         {
             pong->settings.paddle_speed = 450;
+            pong->state = SETTINGS;
+        }
+    }
+    else if (pong->state == SET_MAX_POINTS)
+    {
+        if (al_key_down(state, ALLEGRO_KEY_1))
+        {
+            pong->settings.max_points = 1;
+            pong->state = SETTINGS;
+        }
+        else if (al_key_down(state, ALLEGRO_KEY_2))
+        {
+            pong->settings.max_points = -1;
+            pong->state = SETTINGS;
+        }
+        else if (al_key_down(state, ALLEGRO_KEY_3))
+        {
+            pong->settings.max_points = rand() % 7 + 1;
+            pong->state = SETTINGS;
+        }
+        else if (al_key_down(state, ALLEGRO_KEY_4))
+        {
+            pong->settings.max_points = 5;
+            pong->state = SETTINGS;
+        }
+        else if (al_key_down(state, ALLEGRO_KEY_5))
+        {
             pong->state = SETTINGS;
         }
     }
@@ -304,8 +331,11 @@ void update_pong(struct Pong* pong, double dt)
                 al_play_sample(pong->sounds->score, /* gain */ 1.0, /* center */ 1.0, /* speed */ 1.0, ALLEGRO_PLAYMODE_ONCE, NULL);
             ++pong->player1_score;
             pong->serving_player = 2;
-
-            if (pong->player1_score == MAX_POINTS)
+            
+            short player_winner = 0;
+            player_is_winner(pong, &player_winner);
+            
+            if (player_winner == 1)
             {
                 pong->winning_player = 1;
                 pong->state = DONE;
@@ -323,7 +353,10 @@ void update_pong(struct Pong* pong, double dt)
             ++pong->player2_score;
             pong->serving_player = 1;
 
-            if (pong->player2_score == MAX_POINTS)
+            short player_winner = 0;
+            player_is_winner(pong, &player_winner);
+
+            if (player_winner == 2)
             {
                 pong->winning_player = 2;
                 pong->state = DONE;
@@ -419,7 +452,7 @@ void render_pong(struct Pong pong, struct Fonts fonts)
         al_draw_text(fonts.menu_font, al_map_rgb(255, 255, 255), TABLE_WIDTH / 4, TABLE_HEIGHT / 1.9, ALLEGRO_ALIGN_CENTER, "1. Screen size");
         al_draw_text(fonts.menu_font, al_map_rgb(255, 255, 255), TABLE_WIDTH - TABLE_WIDTH / 4, TABLE_HEIGHT / 1.9, ALLEGRO_ALIGN_CENTER, "3. Paddle speed");
         al_draw_text(fonts.menu_font, al_map_rgb(255, 255, 255), TABLE_WIDTH / 4, TABLE_HEIGHT / 1.7, ALLEGRO_ALIGN_CENTER, "2. Sounds");
-        al_draw_text(fonts.menu_font, al_map_rgb(255, 255, 255), TABLE_WIDTH - TABLE_WIDTH / 4, TABLE_HEIGHT / 1.7, ALLEGRO_ALIGN_CENTER, "4. Max points");
+        al_draw_text(fonts.menu_font, al_map_rgb(255, 255, 255), TABLE_WIDTH - TABLE_WIDTH / 4, TABLE_HEIGHT / 1.7, ALLEGRO_ALIGN_CENTER, "4. Poinst to win");
         al_draw_text(fonts.menu_font, al_map_rgb(255, 255, 255), TABLE_WIDTH / 2, TABLE_HEIGHT / 1.5, ALLEGRO_ALIGN_CENTER, "5. Back");
         al_draw_text(fonts.credit_font, al_map_rgb(255, 255, 255), TABLE_WIDTH / 2.8, TABLE_HEIGHT / 1.1, ALLEGRO_ALIGN_CENTER, "Created by: Alejandro Mujica - Kevin Marquez - Lewis Ochoa");
     }
@@ -450,6 +483,17 @@ void render_pong(struct Pong pong, struct Fonts fonts)
         al_draw_text(fonts.menu_font, al_map_rgb(255, 195, 0), TABLE_WIDTH / 2, TABLE_HEIGHT / 1.7, ALLEGRO_ALIGN_CENTER, "1. Fium!");
         al_draw_text(fonts.menu_font, al_map_rgb(255, 100, 0), TABLE_WIDTH / 2, TABLE_HEIGHT / 1.5, ALLEGRO_ALIGN_CENTER, "2. Fiiuumm!!");
         al_draw_text(fonts.menu_font, al_map_rgb(255, 0, 0), TABLE_WIDTH / 2, TABLE_HEIGHT / 1.3, ALLEGRO_ALIGN_CENTER, "3. Fiiiiiiuuuuummmm!!!");
+        al_draw_text(fonts.credit_font, al_map_rgb(255, 255, 255), TABLE_WIDTH / 2.8, TABLE_HEIGHT / 1.1, ALLEGRO_ALIGN_CENTER, "Created by: Alejandro Mujica - Kevin Marquez - Lewis Ochoa");
+    }
+    else if(pong.state == SET_MAX_POINTS)
+    {
+        al_draw_text(fonts.title_font, al_map_rgb(255, 255, 255), TABLE_WIDTH / 2, TABLE_HEIGHT / 8, ALLEGRO_ALIGN_CENTER, "PONG");
+        al_draw_text(fonts.large_font, al_map_rgb(255, 255, 255), TABLE_WIDTH / 2, TABLE_HEIGHT / 2.5, ALLEGRO_ALIGN_CENTER, "Points to win");
+        al_draw_text(fonts.menu_font, al_map_rgb(255, 0, 0), TABLE_WIDTH / 4, TABLE_HEIGHT / 1.7, ALLEGRO_ALIGN_CENTER, "1. Sudden death ;)");
+        al_draw_text(fonts.menu_font, al_map_rgb(255, 100, 0), TABLE_WIDTH / 4, TABLE_HEIGHT / 1.5, ALLEGRO_ALIGN_CENTER, "2. Difference of two XD");
+        al_draw_text(fonts.menu_font, al_map_rgb(255, 0, 0), TABLE_WIDTH - TABLE_WIDTH / 4, TABLE_HEIGHT / 1.7, ALLEGRO_ALIGN_CENTER, "3. Random 3:)");
+        al_draw_text(fonts.menu_font, al_map_rgb(200, 200, 200), TABLE_WIDTH - TABLE_WIDTH / 4, TABLE_HEIGHT / 1.5, ALLEGRO_ALIGN_CENTER, "4. Boring (5 points)");
+        al_draw_text(fonts.menu_font, al_map_rgb(255, 255, 255), TABLE_WIDTH - TABLE_WIDTH / 2, TABLE_HEIGHT / 1.3, ALLEGRO_ALIGN_CENTER, "5. Back menu");
         al_draw_text(fonts.credit_font, al_map_rgb(255, 255, 255), TABLE_WIDTH / 2.8, TABLE_HEIGHT / 1.1, ALLEGRO_ALIGN_CENTER, "Created by: Alejandro Mujica - Kevin Marquez - Lewis Ochoa");
     }
     else if (pong.state == SELECT_MOD)
@@ -483,5 +527,39 @@ void render_pong(struct Pong pong, struct Fonts fonts)
         sprintf(winner_message, "Player %d won!", pong.winning_player);
         al_draw_text(fonts.large_font, al_map_rgb(255, 255, 255), TABLE_WIDTH / 2, TABLE_HEIGHT / 3, ALLEGRO_ALIGN_CENTER, winner_message);
         al_draw_text(fonts.large_font, al_map_rgb(255, 255, 255), TABLE_WIDTH / 2, TABLE_HEIGHT / 2, ALLEGRO_ALIGN_CENTER, "Press enter to restart");
+    }
+}
+
+void player_is_winner(struct Pong* pong, short* player_winner)
+{
+    if (pong->settings.max_points == -1)
+    {
+        if ((pong->player1_score - pong->player2_score) == 2)
+        {
+            *player_winner = 1;
+        }
+        else if ((pong->player1_score - pong->player2_score) == -2)
+        {
+            *player_winner = 2;
+        }
+        else
+        {
+            *player_winner = 0;
+        }
+    }
+    else
+    {
+        if (pong->player1_score == pong->settings.max_points)
+        {
+            *player_winner = 1;
+        }
+        else if (pong->player2_score == pong->settings.max_points)
+        {
+            *player_winner = 2;
+        }
+        else
+        {
+            *player_winner = 0;
+        }
     }
 }

@@ -77,3 +77,5 @@ void handle_input_pong(struct Pong* pong, ALLEGRO_KEYBOARD_STATE* state);
 void update_pong(struct Pong* pong, double dt);
 
 void render_pong(struct Pong pong, struct Fonts fonts);
+
+void player_is_winner(struct Pong* pong, short* player_winner);
