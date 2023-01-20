@@ -21,7 +21,7 @@ enum PongState
 {
     OPEN_GAME,
     SETTINGS,
-    SET_SCREAM_RESOLUTION,
+    SET_SCREAM_SIZE,
     SET_PADDLE_SPEED,
     SET_MAX_POINTS,
     SET_SOUNDS,
@@ -65,10 +65,12 @@ struct Pong
 
     struct Sounds* sounds;
     struct Custom_Settings settings;
+    
+    ALLEGRO_DISPLAY* window;
 };
 
 
-void init_pong(struct Pong* pong, struct Sounds* sounds);
+void init_pong(struct Pong* pong, struct Sounds* sounds, ALLEGRO_DISPLAY* display);
 
 void handle_input_pong(struct Pong* pong, ALLEGRO_KEYBOARD_STATE* state);
 

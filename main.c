@@ -54,7 +54,7 @@ int main()
     al_start_timer(timer);
 
     struct Pong pong;
-    init_pong(&pong, &sounds);
+    init_pong(&pong, &sounds, display);
 
     float last_frame_time = al_get_time();
     al_play_sample(pong.sounds->intro, /* gain */ 1.0, /* center */ 0.0, /* speed */ 1.0, ALLEGRO_PLAYMODE_ONCE, NULL);
@@ -106,7 +106,7 @@ int main()
             al_draw_scaled_bitmap(
                 render_surface,
                 0, 0, TABLE_WIDTH, TABLE_HEIGHT,   // Source x, y, width, height
-                0, 0, WINDOW_WIDTH, WINDOW_HEIGHT, // Target x, y, width, height
+                0, 0, pong.settings.window_width, pong.settings.window_height, // Target x, y, width, height
                 0 // flags
             );
             al_flip_display();

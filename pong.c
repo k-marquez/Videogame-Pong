@@ -16,7 +16,7 @@
 #include "fonts.h"
 #include "pong.h"
 
-void init_pong(struct Pong* pong, struct Sounds* sounds)
+void init_pong(struct Pong* pong, struct Sounds* sounds, ALLEGRO_DISPLAY* display)
 {
     init_paddle(&pong->player1, PADDLE_X_OFFSET, PADDLE_Y_OFFSET, PADDLE_WIDTH, PADDLE_HEIGHT);
     init_paddle(&pong->player2, TABLE_WIDTH - PADDLE_WIDTH - PADDLE_X_OFFSET, TABLE_HEIGHT - PADDLE_HEIGHT - PADDLE_Y_OFFSET, PADDLE_WIDTH, PADDLE_HEIGHT);
@@ -41,6 +41,7 @@ void init_pong(struct Pong* pong, struct Sounds* sounds)
     pong->bot2.move = -1;
     pong->bot2.side = -1;
     
+    pong->window = display;
     pong->sounds = sounds;
     set_default_config(&pong->settings);
     
@@ -57,6 +58,71 @@ void handle_input_pong(struct Pong* pong, ALLEGRO_KEYBOARD_STATE* state)
             pong->state = SETTINGS;
     }
     else if (pong->state == SETTINGS)
+    {
+        if (al_key_down(state, ALLEGRO_KEY_1))
+        {
+            pong->state = SET_SCREAM_SIZE;
+        }
+        else if (al_key_down(state, ALLEGRO_KEY_2))
+        {
+            pong->state = SET_SOUNDS;
+        }
+        else if (al_key_down(state, ALLEGRO_KEY_3))
+        {
+            pong->state = SET_PADDLE_SPEED;
+        }
+        else if (al_key_down(state, ALLEGRO_KEY_4))
+        {
+            pong->state = SET_MAX_POINTS;
+        }
+        else if (al_key_down(state, ALLEGRO_KEY_5))
+        {
+            pong->state = OPEN_GAME;
+        }
+    }
+    else if (pong->state == SET_SCREAM_SIZE)
+    {
+        if (al_key_down(state, ALLEGRO_KEY_1))
+        {
+            pong->settings.window_width = 1024;
+            pong->settings.window_height = 600;
+            al_resize_display(pong->window, pong->settings.window_width, pong->settings.window_height);
+            pong->state = OPEN_GAME;
+        }
+        else if (al_key_down(state, ALLEGRO_KEY_2))
+        {
+            pong->settings.window_width = 1024;
+            pong->settings.window_height = 576;
+            al_resize_display(pong->window, pong->settings.window_width, pong->settings.window_height);
+            pong->state = OPEN_GAME;
+        }
+        else if (al_key_down(state, ALLEGRO_KEY_3))
+        {
+            pong->settings.window_width = 800;
+            pong->settings.window_height = 600;
+            al_resize_display(pong->window, pong->settings.window_width, pong->settings.window_height);
+            pong->state = OPEN_GAME;
+        }
+        else if (al_key_down(state, ALLEGRO_KEY_4))
+        {
+            pong->settings.window_width = 640;
+            pong->settings.window_height = 512;
+            al_resize_display(pong->window, pong->settings.window_width, pong->settings.window_height);
+            pong->state = OPEN_GAME;
+        }
+        else if (al_key_down(state, ALLEGRO_KEY_5))
+        {
+            pong->settings.window_width = 640;
+            pong->settings.window_height = 480;
+            al_resize_display(pong->window, pong->settings.window_width, pong->settings.window_height);
+            pong->state = OPEN_GAME;
+        }
+        else if (al_key_down(state, ALLEGRO_KEY_4))
+        {
+            pong->state = SETTINGS;
+        }
+    }
+    else if (pong->state == SET_SOUNDS)
     {
         if (al_key_down(state, ALLEGRO_KEY_1))
         {
@@ -304,7 +370,7 @@ void update_pong(struct Pong* pong, double dt)
 
 void render_pong(struct Pong pong, struct Fonts fonts)
 {
-    if (pong.state != OPEN_GAME && pong.state != SETTINGS && pong.state != SELECT_MOD && pong.state != SELECT_AI )
+    if (pong.state != OPEN_GAME && pong.state != SETTINGS && pong.state != SELECT_MOD && pong.state != SELECT_AI && pong.state != SET_MAX_POINTS && pong.state != SET_PADDLE_SPEED && pong.state != SET_SCREAM_SIZE && pong.state != SET_SOUNDS )
     {
         char score[3];
         sprintf(score, "%d", pong.player1_score);
@@ -332,6 +398,29 @@ void render_pong(struct Pong pong, struct Fonts fonts)
     {
         al_draw_text(fonts.title_font, al_map_rgb(255, 255, 255), TABLE_WIDTH / 2, TABLE_HEIGHT / 8, ALLEGRO_ALIGN_CENTER, "PONG");
         al_draw_text(fonts.large_font, al_map_rgb(255, 255, 255), TABLE_WIDTH / 2, TABLE_HEIGHT / 2.5, ALLEGRO_ALIGN_CENTER, "Settings");
+        al_draw_text(fonts.menu_font, al_map_rgb(255, 255, 255), TABLE_WIDTH / 4, TABLE_HEIGHT / 1.9, ALLEGRO_ALIGN_CENTER, "1. Screen size");
+        al_draw_text(fonts.menu_font, al_map_rgb(255, 255, 255), TABLE_WIDTH - TABLE_WIDTH / 4, TABLE_HEIGHT / 1.9, ALLEGRO_ALIGN_CENTER, "3. Paddle speed");
+        al_draw_text(fonts.menu_font, al_map_rgb(255, 255, 255), TABLE_WIDTH / 4, TABLE_HEIGHT / 1.7, ALLEGRO_ALIGN_CENTER, "2. Sounds");
+        al_draw_text(fonts.menu_font, al_map_rgb(255, 255, 255), TABLE_WIDTH - TABLE_WIDTH / 4, TABLE_HEIGHT / 1.7, ALLEGRO_ALIGN_CENTER, "4. Max points");
+        al_draw_text(fonts.menu_font, al_map_rgb(255, 255, 255), TABLE_WIDTH / 2, TABLE_HEIGHT / 1.5, ALLEGRO_ALIGN_CENTER, "5. Back");
+        al_draw_text(fonts.credit_font, al_map_rgb(255, 255, 255), TABLE_WIDTH / 2.8, TABLE_HEIGHT / 1.1, ALLEGRO_ALIGN_CENTER, "Created by: Alejandro Mujica - Kevin Marquez - Lewis Ochoa");
+    }
+    else if(pong.state == SET_SCREAM_SIZE)
+    {
+        al_draw_text(fonts.title_font, al_map_rgb(255, 255, 255), TABLE_WIDTH / 2, TABLE_HEIGHT / 8, ALLEGRO_ALIGN_CENTER, "PONG");
+        al_draw_text(fonts.large_font, al_map_rgb(255, 255, 255), TABLE_WIDTH / 2, TABLE_HEIGHT / 2.5, ALLEGRO_ALIGN_CENTER, "Screen size");
+        al_draw_text(fonts.menu_font, al_map_rgb(255, 255, 255), TABLE_WIDTH / 4, TABLE_HEIGHT / 1.9, ALLEGRO_ALIGN_CENTER, "1. 1024x600");
+        al_draw_text(fonts.menu_font, al_map_rgb(255, 255, 255), TABLE_WIDTH - TABLE_WIDTH / 4, TABLE_HEIGHT / 1.9, ALLEGRO_ALIGN_CENTER, "4. 640x512");
+        al_draw_text(fonts.menu_font, al_map_rgb(255, 255, 255), TABLE_WIDTH / 4, TABLE_HEIGHT / 1.7, ALLEGRO_ALIGN_CENTER, "2. 1024x576");
+        al_draw_text(fonts.menu_font, al_map_rgb(255, 255, 255), TABLE_WIDTH - TABLE_WIDTH / 4, TABLE_HEIGHT / 1.7, ALLEGRO_ALIGN_CENTER, "5. 640x480");
+        al_draw_text(fonts.menu_font, al_map_rgb(255, 255, 255), TABLE_WIDTH / 4, TABLE_HEIGHT / 1.5, ALLEGRO_ALIGN_CENTER, "3. 800x600");
+        al_draw_text(fonts.menu_font, al_map_rgb(255, 255, 255), TABLE_WIDTH - TABLE_WIDTH / 4, TABLE_HEIGHT / 1.5, ALLEGRO_ALIGN_CENTER, "6. Back menu");
+        al_draw_text(fonts.credit_font, al_map_rgb(255, 255, 255), TABLE_WIDTH / 2.8, TABLE_HEIGHT / 1.1, ALLEGRO_ALIGN_CENTER, "Created by: Alejandro Mujica - Kevin Marquez - Lewis Ochoa");
+    }
+    else if(pong.state == SET_SOUNDS)
+    {
+        al_draw_text(fonts.title_font, al_map_rgb(255, 255, 255), TABLE_WIDTH / 2, TABLE_HEIGHT / 8, ALLEGRO_ALIGN_CENTER, "PONG");
+        al_draw_text(fonts.large_font, al_map_rgb(255, 255, 255), TABLE_WIDTH / 2, TABLE_HEIGHT / 2.5, ALLEGRO_ALIGN_CENTER, "Sounds");
         al_draw_text(fonts.menu_font, al_map_rgb(255, 255, 255), TABLE_WIDTH / 2, TABLE_HEIGHT / 1.7, ALLEGRO_ALIGN_CENTER, "1. Enable sounds");
         al_draw_text(fonts.menu_font, al_map_rgb(255, 255, 255), TABLE_WIDTH / 2, TABLE_HEIGHT / 1.5, ALLEGRO_ALIGN_CENTER, "2. Disable sounds");
         al_draw_text(fonts.credit_font, al_map_rgb(255, 255, 255), TABLE_WIDTH / 2.8, TABLE_HEIGHT / 1.1, ALLEGRO_ALIGN_CENTER, "Created by: Alejandro Mujica - Kevin Marquez - Lewis Ochoa");
