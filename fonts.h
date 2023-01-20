@@ -17,6 +17,9 @@ struct Fonts
 {
     ALLEGRO_FONT* large_font;
     ALLEGRO_FONT* score_font;
+    ALLEGRO_FONT* title_font;
+    ALLEGRO_FONT* menu_font;
+    ALLEGRO_FONT* credit_font;
 };
 
 void create_fonts(struct Fonts* fonts);

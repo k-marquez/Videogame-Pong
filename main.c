@@ -57,7 +57,7 @@ int main()
     init_pong(&pong, &sounds);
 
     float last_frame_time = al_get_time();
-
+    al_play_sample(pong.sounds->intro, /* gain */ 1.0, /* center */ 0.0, /* speed */ 1.0, ALLEGRO_PLAYMODE_ONCE, NULL);
     while (true)
     {
         al_wait_for_event(queue, &event);

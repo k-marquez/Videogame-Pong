@@ -15,6 +15,9 @@ void create_fonts(struct Fonts* fonts)
 {
     fonts->large_font = al_load_ttf_font("fonts/font.ttf", 16, ALLEGRO_TTF_MONOCHROME);
     fonts->score_font = al_load_ttf_font("fonts/font.ttf", 32, ALLEGRO_TTF_MONOCHROME);
+    fonts->title_font = al_load_ttf_font("fonts/font.ttf", 64, ALLEGRO_TTF_MONOCHROME);
+    fonts->menu_font = al_load_ttf_font("fonts/font.ttf", 14, ALLEGRO_TTF_MONOCHROME);
+    fonts->credit_font = al_load_ttf_font("fonts/font.ttf", 8, ALLEGRO_TTF_MONOCHROME);
 }
 
 void destroy_fonts(struct Fonts* fonts)

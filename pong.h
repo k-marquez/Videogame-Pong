@@ -18,6 +18,8 @@
 
 enum PongState
 {
+    OPEN_GAME,
+    SETTINGS,
     SELECT_MOD,
     SELECT_AI,
     START,
@@ -33,6 +35,12 @@ enum GameMode
     AI_VS_AI,
 };
 
+enum SoundMode
+{
+   ON,
+   OFF
+};
+
 struct Pong
 {
     struct Paddle player1;
@@ -43,6 +51,7 @@ struct Pong
 
     enum PongState state;
     enum GameMode game_mode;
+    enum SoundMode sound_mode;
 
     int player1_score;
     int player2_score;

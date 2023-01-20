@@ -18,6 +18,7 @@ struct Sounds
     ALLEGRO_SAMPLE* paddle_hit;
     ALLEGRO_SAMPLE* wall_hit;
     ALLEGRO_SAMPLE* score;
+    ALLEGRO_SAMPLE* intro;
 };
 
 void create_sounds(struct Sounds* sounds);

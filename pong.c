@@ -22,8 +22,9 @@ void init_pong(struct Pong* pong, struct Sounds* sounds)
     init_paddle(&pong->player1, PADDLE_X_OFFSET, PADDLE_Y_OFFSET, PADDLE_WIDTH, PADDLE_HEIGHT);
     init_paddle(&pong->player2, TABLE_WIDTH - PADDLE_WIDTH - PADDLE_X_OFFSET, TABLE_HEIGHT - PADDLE_HEIGHT - PADDLE_Y_OFFSET, PADDLE_WIDTH, PADDLE_HEIGHT);
     init_ball(&pong->ball, TABLE_WIDTH / 2 - BALL_SIZE / 2, TABLE_HEIGHT / 2 - BALL_SIZE / 2, BALL_SIZE);
-    pong->state = SELECT_MOD;
+    pong->state = OPEN_GAME;
     pong->game_mode = AI_VS_AI; //Could be setting by user
+    pong->sound_mode = ON; //Could be setting by user
     
     pong->player1_score = 0;
     pong->player2_score = 0;
@@ -47,7 +48,28 @@ void init_pong(struct Pong* pong, struct Sounds* sounds)
 
 void handle_input_pong(struct Pong* pong, ALLEGRO_KEYBOARD_STATE* state)
 {
-    if (pong->state == SELECT_MOD)
+    if (pong->state == OPEN_GAME)
+    {
+        if (al_key_down(state, ALLEGRO_KEY_1))
+            pong->state = SELECT_MOD;
+        else if (al_key_down(state, ALLEGRO_KEY_2))
+            pong->state = SETTINGS;
+    }
+    else if (pong->state == SETTINGS)
+    {
+        if (al_key_down(state, ALLEGRO_KEY_1))
+        {
+            pong->sound_mode = ON;
+            pong->state = OPEN_GAME;
+        }
+        else if (al_key_down(state, ALLEGRO_KEY_2))
+        {
+            pong->sound_mode = OFF;
+            pong->state = OPEN_GAME;
+        }
+
+    }
+    else if (pong->state == SELECT_MOD)
     {
         if (al_key_down(state, ALLEGRO_KEY_1))
         {
@@ -64,7 +86,10 @@ void handle_input_pong(struct Pong* pong, ALLEGRO_KEYBOARD_STATE* state)
             pong->game_mode = AI_VS_AI;
             pong->state = SELECT_AI;
         }
-
+        else if (al_key_down(state, ALLEGRO_KEY_4))
+        {
+            pong->state = OPEN_GAME;
+        }
     }
     else if (pong->state == SELECT_AI)
     {
@@ -190,7 +215,8 @@ void update_pong(struct Pong* pong, double dt)
 
         if (ball_hitbox.x1 > TABLE_WIDTH)
         {
-            al_play_sample(pong->sounds->score, /* gain */ 1.0, /* center */ 1.0, /* speed */ 1.0, ALLEGRO_PLAYMODE_ONCE, NULL);
+            if(pong->sound_mode == ON)
+                al_play_sample(pong->sounds->score, /* gain */ 1.0, /* center */ 1.0, /* speed */ 1.0, ALLEGRO_PLAYMODE_ONCE, NULL);
             ++pong->player1_score;
             pong->serving_player = 2;
 
@@ -207,7 +233,8 @@ void update_pong(struct Pong* pong, double dt)
         }
         else if (ball_hitbox.x2 < 0)
         {
-            al_play_sample(pong->sounds->score, /* gain */ 1.0, /* center */ -1.0, /* speed */ 1.0, ALLEGRO_PLAYMODE_ONCE, NULL);
+            if(pong->sound_mode == ON)
+                al_play_sample(pong->sounds->score, /* gain */ 1.0, /* center */ -1.0, /* speed */ 1.0, ALLEGRO_PLAYMODE_ONCE, NULL);
             ++pong->player2_score;
             pong->serving_player = 1;
 
@@ -225,20 +252,24 @@ void update_pong(struct Pong* pong, double dt)
 
         if (ball_hitbox.y1 <= 0)
         {
-            al_play_sample(pong->sounds->wall_hit, /* gain */ 1.0, /* center */ 0.0, /* speed */ 1.0, ALLEGRO_PLAYMODE_ONCE, NULL);
+
+            if(pong->sound_mode == ON)
+                al_play_sample(pong->sounds->wall_hit, /* gain */ 1.0, /* center */ 0.0, /* speed */ 1.0, ALLEGRO_PLAYMODE_ONCE, NULL);
             pong->ball.y = 0;
             pong->ball.vy *= -1;
         }
         else if (ball_hitbox.y2 >= TABLE_HEIGHT)
         {
-            al_play_sample(pong->sounds->wall_hit, /* gain */ 1.0, /* center */ 0.0, /* speed */ 1.0, ALLEGRO_PLAYMODE_ONCE, NULL);
+            if(pong->sound_mode == ON)
+                al_play_sample(pong->sounds->wall_hit, /* gain */ 1.0, /* center */ 0.0, /* speed */ 1.0, ALLEGRO_PLAYMODE_ONCE, NULL);
             pong->ball.y = TABLE_HEIGHT - pong->ball.height;
             pong->ball.vy *= -1;
         }
         
         if (collides(ball_hitbox, player1_hitbox))
         {
-            al_play_sample(pong->sounds->paddle_hit, /* gain */ 1.0, /* center */ -1.0, /* speed */ 1.0, ALLEGRO_PLAYMODE_ONCE, NULL);
+            if(pong->sound_mode == ON)
+                al_play_sample(pong->sounds->paddle_hit, /* gain */ 1.0, /* center */ -1.0, /* speed */ 1.0, ALLEGRO_PLAYMODE_ONCE, NULL);
             pong->ball.x = player1_hitbox.x2;
             pong->ball.vx *= -1.03;
 
@@ -253,7 +284,8 @@ void update_pong(struct Pong* pong, double dt)
         }
         else if (collides(ball_hitbox, player2_hitbox))
         {
-            al_play_sample(pong->sounds->paddle_hit, /* gain */ 1.0, /* center */ 1.0, /* speed */ 1.0, ALLEGRO_PLAYMODE_ONCE, NULL);
+            if(pong->sound_mode == ON)
+                al_play_sample(pong->sounds->paddle_hit, /* gain */ 1.0, /* center */ 1.0, /* speed */ 1.0, ALLEGRO_PLAYMODE_ONCE, NULL);
             pong->ball.x = player2_hitbox.x1 - pong->ball.width;
             pong->ball.vx *= -1.03;
 
@@ -271,7 +303,7 @@ void update_pong(struct Pong* pong, double dt)
 
 void render_pong(struct Pong pong, struct Fonts fonts)
 {
-    if (pong.state != SELECT_MOD && pong.state != SELECT_AI)
+    if (pong.state != OPEN_GAME && pong.state != SETTINGS && pong.state != SELECT_MOD && pong.state != SELECT_AI )
     {
         char score[3];
         sprintf(score, "%d", pong.player1_score);
@@ -288,21 +320,37 @@ void render_pong(struct Pong pong, struct Fonts fonts)
         render_ball(pong.ball);
     }
 
-    if (pong.state == SELECT_MOD)
+    if (pong.state == OPEN_GAME)
     {
-        al_draw_text(fonts.large_font, al_map_rgb(255, 255, 255), TABLE_WIDTH / 2, TABLE_HEIGHT / 8, ALLEGRO_ALIGN_CENTER, "PONG");
-        al_draw_text(fonts.large_font, al_map_rgb(255, 255, 255), TABLE_WIDTH / 2, TABLE_HEIGHT / 4, ALLEGRO_ALIGN_CENTER, "Select game mode");
-        al_draw_text(fonts.large_font, al_map_rgb(255, 255, 255), TABLE_WIDTH / 2, TABLE_HEIGHT / 2, ALLEGRO_ALIGN_CENTER, "1. Player VS Player");
-        al_draw_text(fonts.large_font, al_map_rgb(255, 255, 255), TABLE_WIDTH / 2, TABLE_HEIGHT / 1.5, ALLEGRO_ALIGN_CENTER, "2. Player VS AI");
-        al_draw_text(fonts.large_font, al_map_rgb(255, 255, 255), TABLE_WIDTH / 2, TABLE_HEIGHT / 1.2, ALLEGRO_ALIGN_CENTER, "3. AI VS AI");
+        al_draw_text(fonts.title_font, al_map_rgb(255, 255, 255), TABLE_WIDTH / 2, TABLE_HEIGHT / 8, ALLEGRO_ALIGN_CENTER, "PONG");
+        al_draw_text(fonts.large_font, al_map_rgb(255, 255, 255), TABLE_WIDTH / 2, TABLE_HEIGHT / 2, ALLEGRO_ALIGN_CENTER, "1. Play");
+        al_draw_text(fonts.large_font, al_map_rgb(255, 255, 255), TABLE_WIDTH / 2, TABLE_HEIGHT / 1.7, ALLEGRO_ALIGN_CENTER, "2. Settings");
+        al_draw_text(fonts.credit_font, al_map_rgb(255, 255, 255), TABLE_WIDTH / 2.8, TABLE_HEIGHT / 1.1, ALLEGRO_ALIGN_CENTER, "Created by: Alejandro Mujica - Kevin Marquez - Lewis Ochoa");
     }
-    if (pong.state == SELECT_AI)
+    else if (pong.state == SETTINGS)
     {
-        al_draw_text(fonts.large_font, al_map_rgb(255, 255, 255), TABLE_WIDTH / 2, TABLE_HEIGHT / 8, ALLEGRO_ALIGN_CENTER, "PONG");
-        al_draw_text(fonts.large_font, al_map_rgb(255, 255, 255), TABLE_WIDTH / 2, TABLE_HEIGHT / 4, ALLEGRO_ALIGN_CENTER, "Select AI difficulty");
-        al_draw_text(fonts.large_font, al_map_rgb(255, 255, 255), TABLE_WIDTH / 2, TABLE_HEIGHT / 2, ALLEGRO_ALIGN_CENTER, "1. Dummy");
-        al_draw_text(fonts.large_font, al_map_rgb(255, 255, 255), TABLE_WIDTH / 2, TABLE_HEIGHT / 1.5, ALLEGRO_ALIGN_CENTER, "2. Regular");
-        al_draw_text(fonts.large_font, al_map_rgb(255, 255, 255), TABLE_WIDTH / 2, TABLE_HEIGHT / 1.2, ALLEGRO_ALIGN_CENTER, "3. Pro");
+        al_draw_text(fonts.title_font, al_map_rgb(255, 255, 255), TABLE_WIDTH / 2, TABLE_HEIGHT / 8, ALLEGRO_ALIGN_CENTER, "PONG");
+        al_draw_text(fonts.large_font, al_map_rgb(255, 255, 255), TABLE_WIDTH / 2, TABLE_HEIGHT / 2.5, ALLEGRO_ALIGN_CENTER, "Settings");
+        al_draw_text(fonts.menu_font, al_map_rgb(255, 255, 255), TABLE_WIDTH / 2, TABLE_HEIGHT / 1.7, ALLEGRO_ALIGN_CENTER, "1. Enable sounds");
+        al_draw_text(fonts.menu_font, al_map_rgb(255, 255, 255), TABLE_WIDTH / 2, TABLE_HEIGHT / 1.5, ALLEGRO_ALIGN_CENTER, "2. Disable sounds");
+        al_draw_text(fonts.credit_font, al_map_rgb(255, 255, 255), TABLE_WIDTH / 2.8, TABLE_HEIGHT / 1.1, ALLEGRO_ALIGN_CENTER, "Created by: Alejandro Mujica - Kevin Marquez - Lewis Ochoa");
+    }
+    else if (pong.state == SELECT_MOD)
+    {
+        al_draw_text(fonts.title_font, al_map_rgb(255, 255, 255), TABLE_WIDTH / 2, TABLE_HEIGHT / 8, ALLEGRO_ALIGN_CENTER, "PONG");
+        al_draw_text(fonts.large_font, al_map_rgb(255, 255, 255), TABLE_WIDTH / 2, TABLE_HEIGHT / 2.7, ALLEGRO_ALIGN_CENTER, "Select game mode");
+        al_draw_text(fonts.menu_font, al_map_rgb(255, 255, 255), TABLE_WIDTH / 2, TABLE_HEIGHT / 1.9, ALLEGRO_ALIGN_CENTER, "1. Player VS Player");
+        al_draw_text(fonts.menu_font, al_map_rgb(255, 255, 255), TABLE_WIDTH / 2, TABLE_HEIGHT / 1.7, ALLEGRO_ALIGN_CENTER, "2. Player VS AI");
+        al_draw_text(fonts.menu_font, al_map_rgb(255, 255, 255), TABLE_WIDTH / 2, TABLE_HEIGHT / 1.5, ALLEGRO_ALIGN_CENTER, "3. AI VS AI");
+        al_draw_text(fonts.menu_font, al_map_rgb(255, 255, 255), TABLE_WIDTH / 2, TABLE_HEIGHT / 1.3, ALLEGRO_ALIGN_CENTER, "4. Back to menu");
+    }
+    else if (pong.state == SELECT_AI)
+    {
+        al_draw_text(fonts.title_font, al_map_rgb(255, 255, 255), TABLE_WIDTH / 2, TABLE_HEIGHT / 8, ALLEGRO_ALIGN_CENTER, "PONG");
+        al_draw_text(fonts.large_font, al_map_rgb(255, 255, 255), TABLE_WIDTH / 2, TABLE_HEIGHT / 2.5, ALLEGRO_ALIGN_CENTER, "Select AI difficulty");
+        al_draw_text(fonts.menu_font, al_map_rgb(255, 255, 255), TABLE_WIDTH / 2, TABLE_HEIGHT / 1.7, ALLEGRO_ALIGN_CENTER, "1. Dummy");
+        al_draw_text(fonts.menu_font, al_map_rgb(255, 255, 255), TABLE_WIDTH / 2, TABLE_HEIGHT / 1.5, ALLEGRO_ALIGN_CENTER, "2. Regular");
+        al_draw_text(fonts.menu_font, al_map_rgb(255, 255, 255), TABLE_WIDTH / 2, TABLE_HEIGHT / 1.3, ALLEGRO_ALIGN_CENTER, "3. Pro");
     }
     else if (pong.state == START)
     {
