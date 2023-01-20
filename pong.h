@@ -19,6 +19,7 @@
 enum PongState
 {
     SELECT_MOD,
+    SELECT_AI,
     START,
     SERVE,
     PLAY,
@@ -28,8 +29,8 @@ enum PongState
 enum GameMode
 {
     PLAYER_VS_PLAYER,
-    IA_VS_PLAYER,
-    IA_VS_IA,
+    AI_VS_PLAYER,
+    AI_VS_AI,
 };
 
 struct Pong

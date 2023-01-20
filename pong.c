@@ -22,8 +22,8 @@ void init_pong(struct Pong* pong, struct Sounds* sounds)
     init_paddle(&pong->player1, PADDLE_X_OFFSET, PADDLE_Y_OFFSET, PADDLE_WIDTH, PADDLE_HEIGHT);
     init_paddle(&pong->player2, TABLE_WIDTH - PADDLE_WIDTH - PADDLE_X_OFFSET, TABLE_HEIGHT - PADDLE_HEIGHT - PADDLE_Y_OFFSET, PADDLE_WIDTH, PADDLE_HEIGHT);
     init_ball(&pong->ball, TABLE_WIDTH / 2 - BALL_SIZE / 2, TABLE_HEIGHT / 2 - BALL_SIZE / 2, BALL_SIZE);
-    pong->state = START;
-    pong->game_mode = IA_VS_IA; //Could be setting by user
+    pong->state = SELECT_MOD;
+    pong->game_mode = AI_VS_AI; //Could be setting by user
     
     pong->player1_score = 0;
     pong->player2_score = 0;
@@ -47,7 +47,51 @@ void init_pong(struct Pong* pong, struct Sounds* sounds)
 
 void handle_input_pong(struct Pong* pong, ALLEGRO_KEYBOARD_STATE* state)
 {
-    if (pong->state == START)
+    if (pong->state == SELECT_MOD)
+    {
+        if (al_key_down(state, ALLEGRO_KEY_1))
+        {
+            pong->game_mode = PLAYER_VS_PLAYER;
+            pong->state = START;
+        }
+        else if (al_key_down(state, ALLEGRO_KEY_2))
+        {
+            pong->game_mode = AI_VS_PLAYER;
+            pong->state = SELECT_AI;
+        }
+        else if (al_key_down(state, ALLEGRO_KEY_3))
+        {
+            pong->game_mode = AI_VS_AI;
+            pong->state = SELECT_AI;
+        }
+
+    }
+    else if (pong->state == SELECT_AI)
+    {
+        if (al_key_down(state, ALLEGRO_KEY_1))
+        {
+            pong->bot1.game_difficulty = DUMMY;
+            if(pong->game_mode == AI_VS_AI)
+                pong->bot2.game_difficulty = DUMMY;
+            pong->state = START;
+        }
+        else if (al_key_down(state, ALLEGRO_KEY_2))
+        {
+            pong->bot1.game_difficulty = REGULAR;
+            if(pong->game_mode == AI_VS_AI)
+                pong->bot2.game_difficulty = REGULAR;
+            pong->state = START;
+        }
+        else if (al_key_down(state, ALLEGRO_KEY_3))
+        {
+            pong->bot1.game_difficulty = PRO;
+            if(pong->game_mode == AI_VS_AI)
+                pong->bot2.game_difficulty = PRO;
+            pong->state = START;
+        }
+
+    }
+    else if (pong->state == START)
     {
         if (al_key_down(state, ALLEGRO_KEY_ENTER))
         {
@@ -89,7 +133,7 @@ void handle_input_pong(struct Pong* pong, ALLEGRO_KEYBOARD_STATE* state)
             }
         }
 
-        if (pong->game_mode != IA_VS_IA)
+        if (pong->game_mode != AI_VS_AI)
         {
             if (al_key_down(state, ALLEGRO_KEY_DOWN))
             {
@@ -109,7 +153,7 @@ void handle_input_pong(struct Pong* pong, ALLEGRO_KEYBOARD_STATE* state)
     {
         if (al_key_down(state, ALLEGRO_KEY_ENTER))
         {
-            pong->state = SERVE;
+            pong->state = SELECT_MOD;
             init_ball(&pong->ball, TABLE_WIDTH / 2 - BALL_SIZE / 2, TABLE_HEIGHT / 2 - BALL_SIZE / 2, BALL_SIZE);
 
             pong->player1_score = 0;
@@ -227,22 +271,40 @@ void update_pong(struct Pong* pong, double dt)
 
 void render_pong(struct Pong pong, struct Fonts fonts)
 {
-    al_draw_filled_rectangle(
+    if (pong.state != SELECT_MOD && pong.state != SELECT_AI)
+    {
+        char score[3];
+        sprintf(score, "%d", pong.player1_score);
+        al_draw_text(fonts.score_font, al_map_rgb(255, 255, 255), TABLE_WIDTH / 2 - 50, TABLE_HEIGHT / 6, ALLEGRO_ALIGN_CENTER, score);
+        sprintf(score, "%d", pong.player2_score);
+        al_draw_text(fonts.score_font, al_map_rgb(255, 255, 255), TABLE_WIDTH / 2 + 50, TABLE_HEIGHT / 6, ALLEGRO_ALIGN_CENTER, score);
+        al_draw_filled_rectangle(
         TABLE_WIDTH / 2 - MID_LINE_WIDTH / 2, 0,
         TABLE_WIDTH / 2 + MID_LINE_WIDTH / 2, TABLE_HEIGHT,
         al_map_rgb(255, 255, 255)
     );
-    render_paddle(pong.player1);
-    render_paddle(pong.player2);
-    render_ball(pong.ball);
+        render_paddle(pong.player1);
+        render_paddle(pong.player2);
+        render_ball(pong.ball);
+    }
 
-    char score[3];
-    sprintf(score, "%d", pong.player1_score);
-    al_draw_text(fonts.score_font, al_map_rgb(255, 255, 255), TABLE_WIDTH / 2 - 50, TABLE_HEIGHT / 6, ALLEGRO_ALIGN_CENTER, score);
-    sprintf(score, "%d", pong.player2_score);
-    al_draw_text(fonts.score_font, al_map_rgb(255, 255, 255), TABLE_WIDTH / 2 + 50, TABLE_HEIGHT / 6, ALLEGRO_ALIGN_CENTER, score);
-
-    if (pong.state == START)
+    if (pong.state == SELECT_MOD)
+    {
+        al_draw_text(fonts.large_font, al_map_rgb(255, 255, 255), TABLE_WIDTH / 2, TABLE_HEIGHT / 8, ALLEGRO_ALIGN_CENTER, "PONG");
+        al_draw_text(fonts.large_font, al_map_rgb(255, 255, 255), TABLE_WIDTH / 2, TABLE_HEIGHT / 4, ALLEGRO_ALIGN_CENTER, "Select game mode");
+        al_draw_text(fonts.large_font, al_map_rgb(255, 255, 255), TABLE_WIDTH / 2, TABLE_HEIGHT / 2, ALLEGRO_ALIGN_CENTER, "1. Player VS Player");
+        al_draw_text(fonts.large_font, al_map_rgb(255, 255, 255), TABLE_WIDTH / 2, TABLE_HEIGHT / 1.5, ALLEGRO_ALIGN_CENTER, "2. Player VS AI");
+        al_draw_text(fonts.large_font, al_map_rgb(255, 255, 255), TABLE_WIDTH / 2, TABLE_HEIGHT / 1.2, ALLEGRO_ALIGN_CENTER, "3. AI VS AI");
+    }
+    if (pong.state == SELECT_AI)
+    {
+        al_draw_text(fonts.large_font, al_map_rgb(255, 255, 255), TABLE_WIDTH / 2, TABLE_HEIGHT / 8, ALLEGRO_ALIGN_CENTER, "PONG");
+        al_draw_text(fonts.large_font, al_map_rgb(255, 255, 255), TABLE_WIDTH / 2, TABLE_HEIGHT / 4, ALLEGRO_ALIGN_CENTER, "Select AI difficulty");
+        al_draw_text(fonts.large_font, al_map_rgb(255, 255, 255), TABLE_WIDTH / 2, TABLE_HEIGHT / 2, ALLEGRO_ALIGN_CENTER, "1. Dummy");
+        al_draw_text(fonts.large_font, al_map_rgb(255, 255, 255), TABLE_WIDTH / 2, TABLE_HEIGHT / 1.5, ALLEGRO_ALIGN_CENTER, "2. Regular");
+        al_draw_text(fonts.large_font, al_map_rgb(255, 255, 255), TABLE_WIDTH / 2, TABLE_HEIGHT / 1.2, ALLEGRO_ALIGN_CENTER, "3. Pro");
+    }
+    else if (pong.state == START)
     {
         al_draw_text(fonts.large_font, al_map_rgb(255, 255, 255), TABLE_WIDTH / 2, TABLE_HEIGHT / 2, ALLEGRO_ALIGN_CENTER, "Press enter to start");
     }

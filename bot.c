@@ -1,9 +1,12 @@
 /*
     ISPPJ1 2023
-    Practice: IA Pong
+    Practice: AI Pong
 
     Author: Kevin Márquez
     marquezberriosk@gmail.com
+
+    Author: Lewis Ochoa
+    lewis8a@gmail.com
 
     This file contains the definition of the functions to watch the pong game and decide whether to move, decide the direction of movement, move the paddle, and an wrapper to call this functions.
 */

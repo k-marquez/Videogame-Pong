@@ -81,9 +81,9 @@ int main()
         {
             case PLAYER_VS_PLAYER:
                 break;
-            case IA_VS_IA:
+            case AI_VS_AI:
                 play_bot(&pong.bot2, &pong.player2, pong.ball);
-            case IA_VS_PLAYER:
+            case AI_VS_PLAYER:
                 play_bot(&pong.bot1, &pong.player1, pong.ball);
                 break;
         }

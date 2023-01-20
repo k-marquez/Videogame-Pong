@@ -19,7 +19,7 @@
 #endif
 
 #define WINDOW_WIDTH 1024
-#define WINDOW_HEIGHT 600
+#define WINDOW_HEIGHT 500
 #define TABLE_WIDTH 432
 #define TABLE_HEIGHT 243
 #define PADDLE_WIDTH 5

@@ -1,9 +1,12 @@
 /*
     ISPPJ1 2023
-    Practice: IA Pong
+    Practice: AI Pong
 
     Author: Kevin Márquez
     marquezberriosk@gmail.com
+
+    Author: Lewis Ochoa
+    lewis8a@gmail.com
     
     This file contains the definition of a bot to play and the declaration
     of the functions to watch de game, decide where to move, move the paddle,
