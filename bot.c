@@ -68,17 +68,14 @@ void observe_game(struct Bot* bot, struct Ball ball)
 
 void decide_move(struct Bot* bot, struct Paddle player, struct Ball ball)
 {
-    if (player.y < ball.y)
-    {
-        bot->direction_move = DOWN;
-    }
-    else if(player.y > ball.y)
-    {
-        bot->direction_move = UP;
-    }
-    else
-    {
+    if(ball.y > player.y && ball.y + BALL_SIZE < player.y + PADDLE_HEIGHT)
         bot->direction_move = KEEP;
+    else 
+    {
+        if (player.y + PADDLE_HEIGHT < ball.y)
+            bot->direction_move = DOWN;
+        else if(player.y > ball.y + BALL_SIZE)
+            bot->direction_move = UP;
     }
 }
 
@@ -95,6 +92,7 @@ void excute_move(struct Bot bot, struct Paddle* player)
                 player->vy = PADDLE_SPEED;
                 break;
             case KEEP:
+                player->vy = 0;
                 break;
         }
     }
