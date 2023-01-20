@@ -283,8 +283,8 @@ void render_pong(struct Pong pong, struct Fonts fonts)
         TABLE_WIDTH / 2 + MID_LINE_WIDTH / 2, TABLE_HEIGHT,
         al_map_rgb(255, 255, 255)
     );
-        render_paddle(pong.player1);
-        render_paddle(pong.player2);
+        render_paddle(pong.player1,0);
+        render_paddle(pong.player2,1);
         render_ball(pong.ball);
     }
 

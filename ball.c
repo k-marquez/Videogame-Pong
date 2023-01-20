@@ -40,7 +40,13 @@ void update_ball(struct Ball* ball, float dt)
 
 void render_ball(struct Ball ball)
 {
+    int color1 = 0;
+    int color2 = 0;
+    if(ball.vx<0)
+        color1 = 255;
+    else
+        color2 = 255;
     al_draw_filled_rectangle(
-        ball.x, ball.y, ball.x + ball.width, ball.y + ball.height, al_map_rgb(255, 255, 255)
+        ball.x, ball.y, ball.x + ball.width, ball.y + ball.height, al_map_rgb(color1, 0, color2)
     );
 }

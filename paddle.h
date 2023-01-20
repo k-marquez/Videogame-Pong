@@ -28,4 +28,4 @@ void build_paddle_hitbox(struct Paddle paddle, struct Hitbox* hitbox);
 
 void update_paddle(struct Paddle* paddle, float dt);
 
-void render_paddle(struct Paddle paddle);
+void render_paddle(struct Paddle paddle, int player);

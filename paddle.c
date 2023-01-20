@@ -38,10 +38,16 @@ void update_paddle(struct Paddle* paddle, float dt)
     paddle->y = MAX(0, MIN(paddle->y, TABLE_HEIGHT - PADDLE_HEIGHT));
 }
 
-void render_paddle(struct Paddle paddle)
+void render_paddle(struct Paddle paddle, int player)
 {
+    int color1 = 0;
+    int color2 = 0;
+    if(player)
+        color1 = 255;
+    else
+        color2 = 255;
     al_draw_filled_rectangle(
         paddle.x, paddle.y, paddle.x + paddle.width, paddle.y + paddle.height,
-        al_map_rgb(255, 255, 255)
+        al_map_rgb(color1, 0, color2)
     );
 }
