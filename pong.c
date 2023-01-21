@@ -5,6 +5,12 @@
     Author: Alejandro Mujica
     alejandro.j.mujic4@gmail.com
 
+    Author: Kevin Márquez
+    marquezberriosk@gmail.com
+
+    Author: Lewis Ochoa
+    lewis8a@gmail.com
+
     This file contains the definition of the functions to init a pong game,
     update it, and render it.
 */
@@ -24,6 +30,7 @@ void init_pong(struct Pong* pong, struct Sounds* sounds, ALLEGRO_DISPLAY* displa
     pong->state = OPEN_GAME;
     pong->game_mode = AI_VS_AI; //Could be setting by user
     pong->sound_mode = ON; //Could be setting by user
+    pong->music = OFF;
     
     pong->player1_score = 0;
     pong->player2_score = 0;
@@ -132,6 +139,8 @@ void handle_input_pong(struct Pong* pong, ALLEGRO_KEYBOARD_STATE* state)
         else if (al_key_down(state, ALLEGRO_KEY_2))
         {
             pong->sound_mode = OFF;
+            al_stop_samples();
+            pong->music = OFF;
             pong->state = SETTINGS;
         }
 
@@ -230,6 +239,11 @@ void handle_input_pong(struct Pong* pong, ALLEGRO_KEYBOARD_STATE* state)
     }
     else if (pong->state == START)
     {
+        if(pong->sound_mode == ON && pong->music == OFF)
+        {
+            al_play_sample(pong->sounds->music, /* gain */ 0.5, /* center */ 0.0, /* speed */ 1.0, ALLEGRO_PLAYMODE_LOOP, NULL);
+            pong->music = ON;
+        }
         if (al_key_down(state, ALLEGRO_KEY_ENTER))
         {
             pong->state = SERVE;
@@ -338,6 +352,13 @@ void update_pong(struct Pong* pong, double dt)
             if (player_winner == 1)
             {
                 pong->winning_player = 1;
+                if(pong->sound_mode == ON)
+                {
+                    if(pong->game_mode == PLAYER_VS_PLAYER)
+                        al_play_sample(pong->sounds->player1_win, /* gain */ 2.0, /* center */ 0.0, /* speed */ 1.0, ALLEGRO_PLAYMODE_ONCE, NULL);
+                    else if (pong->game_mode == AI_VS_PLAYER)
+                        al_play_sample(pong->sounds->game_over, /* gain */ 2.0, /* center */ 0.0, /* speed */ 1.0, ALLEGRO_PLAYMODE_ONCE, NULL);
+                }
                 pong->state = DONE;
             }
             else
@@ -359,6 +380,13 @@ void update_pong(struct Pong* pong, double dt)
             if (player_winner == 2)
             {
                 pong->winning_player = 2;
+                if(pong->sound_mode == ON)
+                {
+                    if (pong->game_mode == PLAYER_VS_PLAYER)
+                        al_play_sample(pong->sounds->player2_win, /* gain */ 2.0, /* center */ 0.0, /* speed */ 1.0, ALLEGRO_PLAYMODE_ONCE, NULL);
+                    else if (pong->game_mode == AI_VS_PLAYER)
+                        al_play_sample(pong->sounds->you_win, /* gain */ 2.0, /* center */ 0.0, /* speed */ 1.0, ALLEGRO_PLAYMODE_ONCE, NULL);
+                }
                 pong->state = DONE;
             }
             else

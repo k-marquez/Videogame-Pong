@@ -5,6 +5,12 @@
     Author: Alejandro Mujica
     alejandro.j.mujic4@gmail.com
 
+    Author: Kevin Márquez
+    marquezberriosk@gmail.com
+
+    Author: Lewis Ochoa
+    lewis8a@gmail.com
+
     This file contains the definition of a pong game and the declaration
     of the functions to init it, update it, and render it.
 */
@@ -57,6 +63,7 @@ struct Pong
     enum PongState state;
     enum GameMode game_mode;
     enum SoundMode sound_mode;
+    enum SoundMode music;
 
     int player1_score;
     int player2_score;

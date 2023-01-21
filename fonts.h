@@ -5,6 +5,12 @@
     Author: Alejandro Mujica
     alejandro.j.mujic4@gmail.com
 
+    Author: Kevin Márquez
+    marquezberriosk@gmail.com
+
+    Author: Lewis Ochoa
+    lewis8a@gmail.com
+
     This file contains the definition of a struct to load fonts and the
     declaratrion of functions to create them and destroy them.
 */
