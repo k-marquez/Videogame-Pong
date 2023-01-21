@@ -15,7 +15,7 @@ Hecho con amor y lágrimas de programador.
 
 - Allegro 5.
 
-Aceptamos sugerencias, comentarios, zelle, BofA, PayPal, oro, criptomonedas (No Petros), efectivo (No Bolívares digitales ni sus evoluciones posteriores), gitcards... Y ya no se nos ocurren otros medios de pago.
+Aceptamos sugerencias, comentarios, zelle, BofA, PayPal, oro, criptomonedas (No Petros), efectivo (No Bolívares digitales ni sus evoluciones posteriores), gitfcards... Y ya no se nos ocurren otros medios de pago.
 
 Desarrollado por Alejandro Mujica (El milenial), Lewis Ochoa (El Ochoa) y Kevin Márquez (<Inserte aquí el apodo>).
 
